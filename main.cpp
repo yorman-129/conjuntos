@@ -27,7 +27,7 @@ int main()
         {
         case 1:
             int tamano = 0;
-            cout << "escribe el tamaño del conjunto\n";
+            cout << "Escribe el tamaño del conjunto\n";
             cin >> tamano;
             crearConjunto(tamano);
 
