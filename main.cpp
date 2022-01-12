@@ -13,7 +13,7 @@ struct Nodo
 
     Nodo *siguiente;
     Nodo *siguienteConjunto;
-} * inicio;
+} *inicio;
 
 int menuPpal();
 void crearConjunto(int, string);
@@ -34,7 +34,7 @@ int main()
             cout << "Escribe el tamaño del conjunto\n";
             cin >> tamano;
             crearConjunto(tamano, nombre);
-        Nodo *lista=inicio;
+        Nodo *lista=inicio->siguiente;
             while (lista != NULL)
     {
         int dato;
@@ -109,8 +109,13 @@ void crearConjunto(int tamano, string nombre)
                 aux = aux->siguiente;
             }
 
+            if(inicio==NULL){
             inicio = conjunto;
             inicio->siguiente = nuevo;
+            }else{
+                aux2->siguiente=nuevo;
+                nuevo->siguiente=aux;
+            }
         }
     }
     else
