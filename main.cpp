@@ -13,10 +13,11 @@ struct Nodo
 
     Nodo *siguiente;
     Nodo *siguienteConjunto;
-} *inicio;
+} *inicio,*cola;
 
 int menuPpal();
 void crearConjunto(int, string);
+void mostrarConjunto(string);
 
 int main()
 {
@@ -28,29 +29,20 @@ int main()
         switch (opcion)
         {
         case 1:
-            int tamano = 0;
+            int tamano;
             cout << "Escribe el nombre del conjunto\n";
             cin >> nombre;
             cout << "Escribe el tamaño del conjunto\n";
             cin >> tamano;
             crearConjunto(tamano, nombre);
-        Nodo *lista=inicio->siguiente;
-            while (lista != NULL)
-    {
-        int dato;
-        dato=lista->dato;
-        lista = lista->siguiente;
-        cout << "\n---------------------------------------------------------------------------\n";
-        cout << "\n-->"<< dato << endl;
-        cout << "\n---------------------------------------------------------------------------\n";
-    }
-
-
+            
             break;
-      /*  case 2:
-
+       case 2:
+            mostrarConjunto("a");
+            mostrarConjunto("b");
+            mostrarConjunto("c");
             break;
-        case 3:
+       /* case 3:
 
             break;
         case 4:
@@ -111,6 +103,7 @@ void crearConjunto(int tamano, string nombre)
 
             if(inicio==NULL){
             inicio = conjunto;
+            cola=inicio;
             inicio->siguiente = nuevo;
             }else{
                 aux2->siguiente=nuevo;
@@ -120,11 +113,16 @@ void crearConjunto(int tamano, string nombre)
     }
     else
     {
+       
+       
+       cola->siguienteConjunto=conjunto;
+       cola=conjunto;
+        
         for (int i = 0; i < tamano; i++)
         {
             int dato = 0;
             Nodo *nuevo = new Nodo(); // creamos el nuevo Nodo
-            Nodo *aux = inicio;
+            Nodo *aux = cola;
             Nodo *aux2 = NULL;
 
             cout << "Digita el numero a insertar en el conjunto";
@@ -138,13 +136,30 @@ void crearConjunto(int tamano, string nombre)
                 aux = aux->siguiente;
             }
 
+            if(aux==cola){
+            aux2 = conjunto;
+            aux2->siguiente = nuevo;
+            }else{
                 aux2->siguiente=nuevo;
                 nuevo->siguiente=aux;
             }
-            Nodo *aux3=inicio;
-            while(aux3->siguiente!=NULL){
-                aux3->siguiente=aux3;
-            }
-            aux3->siguienteConjunto=conjunto;
         }
     }
+}
+
+/////mostrar conjuntooo
+void mostrarConjunto(string conjunto){
+    Nodo *aux=inicio;
+    Nodo *aux2=NULL;
+    while(aux->nombre!=conjunto){
+        aux=aux->siguienteConjunto;
+    }
+   
+        aux2=aux->siguiente;
+        while(aux2!=NULL){
+        cout << "\n---------------------------------------------------------------------------\n";
+        cout << "\n" <<aux2->dato << endl;
+        cout << "\n---------------------------------------------------------------------------\n";
+        aux2=aux2->siguiente;
+        }
+}
