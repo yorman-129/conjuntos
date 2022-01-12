@@ -9,17 +9,19 @@ using namespace std;
 struct Nodo
 {
     int dato;
+    string nombre;
 
     Nodo *siguiente;
     Nodo *siguienteConjunto;
 } * inicio;
 
 int menuPpal();
-void crearConjunto(int);
+void crearConjunto(int, string);
 
 int main()
 {
     int opcion = 0;
+    string nombre;
     do
     {
         opcion = menuPpal();
@@ -27,12 +29,25 @@ int main()
         {
         case 1:
             int tamano = 0;
+            cout << "Escribe el nombre del conjunto\n";
+            cin >> nombre;
             cout << "Escribe el tamaño del conjunto\n";
             cin >> tamano;
-            crearConjunto(tamano);
+            crearConjunto(tamano, nombre);
+        Nodo *lista=inicio;
+            while (lista != NULL)
+    {
+        int dato;
+        dato=lista->dato;
+        lista = lista->siguiente;
+        cout << "\n---------------------------------------------------------------------------\n";
+        cout << "\n-->"<< dato << endl;
+        cout << "\n---------------------------------------------------------------------------\n";
+    }
+
 
             break;
-        case 2:
+      /*  case 2:
 
             break;
         case 3:
@@ -43,7 +58,7 @@ int main()
             break;
 
         default:
-            break;
+            break;*/
         }
     } while (opcion != 4);
 }
@@ -55,7 +70,7 @@ int menuPpal()
     cout << "------------------------Menu Principal------------------------\n";
     cout << "--------------------------------------------------------------\n";
     cout << "--------------------------------------------------------------\n";
-    cout << "---1. Agregar ------------------------------------------------\n";
+    cout << "---1. Crear Conjunto------------------------------------------\n";
     cout << "---2. Mostrar Por Nombre--------------------------------------\n";
     cout << "---3. Buscar--------------------------------------------------\n";
     cout << "---4. Modificar-----------------------------------------------\n";
@@ -70,21 +85,18 @@ int menuPpal()
 }
 
 // funcion para la creacion de los conjuntos
-void crearConjunto(int tamano)
+void crearConjunto(int tamano, string nombre)
 {
     Nodo *conjunto = new Nodo();
+    conjunto->nombre = nombre;
     if (inicio == NULL)
     {
-        
         for (int i = 0; i < tamano; i++)
         {
             int dato = 0;
-            Nodo *nuevo = new Nodo();//creamos el nuevo Nodo
+            Nodo *nuevo = new Nodo(); // creamos el nuevo Nodo
             Nodo *aux = inicio;
             Nodo *aux2 = NULL;
-
-            conjunto->siguiente=aux;// voy aqui estoy pensando en crear una estructura de Nodo nueva para manejar los conjuntos!!!!!!!!!!!!!!
-
 
             cout << "Digita el numero a insertar en el conjunto";
             cin >> dato;
@@ -96,6 +108,38 @@ void crearConjunto(int tamano)
                 aux2 = aux;
                 aux = aux->siguiente;
             }
+
+            inicio = conjunto;
+            inicio->siguiente = nuevo;
         }
     }
-}
+    else
+    {
+        for (int i = 0; i < tamano; i++)
+        {
+            int dato = 0;
+            Nodo *nuevo = new Nodo(); // creamos el nuevo Nodo
+            Nodo *aux = inicio;
+            Nodo *aux2 = NULL;
+
+            cout << "Digita el numero a insertar en el conjunto";
+            cin >> dato;
+
+            nuevo->dato = dato;
+
+            while ((aux != NULL) and (aux->dato < dato))
+            {
+                aux2 = aux;
+                aux = aux->siguiente;
+            }
+
+                aux2->siguiente=nuevo;
+                nuevo->siguiente=aux;
+            }
+            Nodo *aux3=inicio;
+            while(aux3->siguiente!=NULL){
+                aux3->siguiente=aux3;
+            }
+            aux3->siguienteConjunto=conjunto;
+        }
+    }
