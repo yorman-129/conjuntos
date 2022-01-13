@@ -13,10 +13,12 @@ struct Nodo
 
     Nodo *siguiente;
     Nodo *siguienteConjunto;
-} *inicio;
+} * inicio, *cola;
 
 int menuPpal();
+int menuMantenimiento();
 void crearConjunto(int, string);
+void mostrarConjunto(string);
 
 int main()
 {
@@ -28,37 +30,43 @@ int main()
         switch (opcion)
         {
         case 1:
-            int tamano = 0;
+            int tamano;
             cout << "Escribe el nombre del conjunto\n";
             cin >> nombre;
             cout << "Escribe el tamaño del conjunto\n";
             cin >> tamano;
             crearConjunto(tamano, nombre);
-        Nodo *lista=inicio->siguiente;
-            while (lista != NULL)
-    {
-        int dato;
-        dato=lista->dato;
-        lista = lista->siguiente;
-        cout << "\n---------------------------------------------------------------------------\n";
-        cout << "\n-->"<< dato << endl;
-        cout << "\n---------------------------------------------------------------------------\n";
-    }
-
 
             break;
-      /*  case 2:
+        case 2:
 
+                int op;
+                string nombre;
+                op = menuMantenimiento();
+
+                switch (op)
+                {
+                case 1:
+
+                    cout << "\nDigita el nombre del conjunto\n";
+                    cin >> nombre;
+                    mostrarConjunto(nombre);
+                    break;
+
+                default:
+                    break;
+                }
             break;
-        case 3:
 
-            break;
-        case 4:
+            /* case 3:
 
-            break;
+                 break;
+             case 4:
 
-        default:
-            break;*/
+                 break;
+
+             default:
+                 break;*/
         }
     } while (opcion != 4);
 }
@@ -67,18 +75,32 @@ int main()
 int menuPpal()
 {
     int op;
-    cout << "------------------------Menu Principal------------------------\n";
+    cout << "----------------------Menu Principal--------------------------\n";
     cout << "--------------------------------------------------------------\n";
     cout << "--------------------------------------------------------------\n";
     cout << "---1. Crear Conjunto------------------------------------------\n";
-    cout << "---2. Mostrar Por Nombre--------------------------------------\n";
-    cout << "---3. Buscar--------------------------------------------------\n";
-    cout << "---4. Modificar-----------------------------------------------\n";
-    cout << "---5. Eliminar------------------------------------------------\n";
-    cout << "---6. informes------------------------------------------------\n";
-    cout << "---7. Salir del Programa--------------------------------------\n";
+    cout << "---2. Mantenimiento-------------------------------------------\n";
+    cout << "---3. Digita el Problema--------------------------------------\n";
+    cout << "---4. Salir del Programa--------------------------------------\n";
     cout << "--------------------------------------------------------------\n";
-    cout << "---<1-2-3-4-5-6>----------------------------------------------\n";
+    cout << "--------<1-2-3-4>---------------------------------------------\n";
+    cin >> op;
+    return op;
+    return 0;
+}
+int menuMantenimiento()
+{
+    int op;
+    cout << "---------------------Menu Mantenimiento-----------------------\n";
+    cout << "--------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------\n";
+    cout << "---1. Mostrar conjunto-----------------------------------------\n";
+    cout << "---2. Modificar conjunto--------------------------------------\n";
+    cout << "---3. Eliminar elemento---------------------------------------\n";
+    cout << "---4. Eliminar conjunto---------------------------------------\n";
+    cout << "---5. Salir del Programa--------------------------------------\n";
+    cout << "--------------------------------------------------------------\n";
+    cout << "---------<1-2-3-4-5>------------------------------------------\n";
     cin >> op;
     return op;
     return 0;
@@ -109,22 +131,30 @@ void crearConjunto(int tamano, string nombre)
                 aux = aux->siguiente;
             }
 
-            if(inicio==NULL){
-            inicio = conjunto;
-            inicio->siguiente = nuevo;
-            }else{
-                aux2->siguiente=nuevo;
-                nuevo->siguiente=aux;
+            if (inicio == NULL)
+            {
+                inicio = conjunto;
+                cola = inicio;
+                inicio->siguiente = nuevo;
+            }
+            else
+            {
+                aux2->siguiente = nuevo;
+                nuevo->siguiente = aux;
             }
         }
     }
     else
     {
+
+        cola->siguienteConjunto = conjunto;
+        cola = conjunto;
+
         for (int i = 0; i < tamano; i++)
         {
             int dato = 0;
             Nodo *nuevo = new Nodo(); // creamos el nuevo Nodo
-            Nodo *aux = inicio;
+            Nodo *aux = cola;
             Nodo *aux2 = NULL;
 
             cout << "Digita el numero a insertar en el conjunto";
@@ -138,13 +168,37 @@ void crearConjunto(int tamano, string nombre)
                 aux = aux->siguiente;
             }
 
-                aux2->siguiente=nuevo;
-                nuevo->siguiente=aux;
+            if (aux == cola)
+            {
+                aux2 = conjunto;
+                aux2->siguiente = nuevo;
             }
-            Nodo *aux3=inicio;
-            while(aux3->siguiente!=NULL){
-                aux3->siguiente=aux3;
+            else
+            {
+                aux2->siguiente = nuevo;
+                nuevo->siguiente = aux;
             }
-            aux3->siguienteConjunto=conjunto;
         }
     }
+}
+
+/////funcion para mostrar los conjuntos conjuntos
+void mostrarConjunto(string conjunto)
+{
+    Nodo *aux = inicio;
+    Nodo *aux2 = NULL;
+    while (aux->nombre != conjunto)
+    {
+        aux = aux->siguienteConjunto;
+    }
+
+    aux2 = aux->siguiente;
+    cout<<endl<<conjunto<<" ("<<aux2->dato;
+    aux2 = aux2->siguiente;
+    while (aux2 != NULL)
+    {
+        cout <<" - " <<aux2->dato ;
+        aux2 = aux2->siguiente;
+    }
+    cout<<")\n";
+}
