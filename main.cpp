@@ -1,7 +1,8 @@
-#include <iostream>
-#include<string.h>
-#include <iomanip>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <iostream>
+#include <cmath>
 #define TAMANO 15
 
 using namespace std;
@@ -21,62 +22,46 @@ int menuPpal();
 int menuMantenimiento();
 void crearConjunto(int, string);
 void mostrarConjunto(string);
-bool validarParentesis(char[]);
-void expresionPosfija(string );
-bool existeConjunto(string);
-bool existenTodosConjuntos(string);
-
+bool validarParentesis(string);
+bool numerosRepetidos(int);
+string postfijo(string);
+string resultado(string);
+string Union(string, string); // retorna nombre del nuevo conjunto unido
 
 int main()
 {
-    int opcion = 0;
-    string nombre;
+    string expresion, nombre,expPos,fin;
+    int tamano;
+    cout << "----------------------Menu Principal--------------------------\n";
+    cout << "--------------------------------------------------------------\n";
     do
     {
-        opcion = menuPpal();
-        switch (opcion)
+        cout << "Digita tu expresion ==>\n";
+        cin >> expresion;
+    } while (validarParentesis(expresion));
+
+    cout << "--------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------\n";
+
+    system("pause");
+
+    for (int i = 0; i < expresion.length(); i++)
+    {
+        if (expresion[i] >= 'a' and expresion[i] <= 'z')
         {
-        case 1:
-            int tamano;
-            cout << "Escribe el nombre del conjunto\n";
-            cin >> nombre;
-            cout << "Escribe el tamaño del conjunto\n";
+
+            nombre = expresion[i];
+            cout << "Digita la cantidad de elementos en: " << nombre << endl;
             cin >> tamano;
             crearConjunto(tamano, nombre);
-
-            break;
-        case 2:
-
-            int op;
-
-            op = menuMantenimiento();
-
-            switch (op)
-            {
-            case 1:
-
-                cout << "\nDigita el nombre del conjunto\n";
-                cin >> nombre;
-                mostrarConjunto(nombre);
-                break;
-
-            default:
-                break;
-            }
-            break;
-
-        case 3:
-            expresionPosfija(" ");
-            break;
-            /*
-           case 4:
-
-               break;
-
-           default:
-               break;*/
         }
-    } while (opcion != 4);
+    }
+
+    expPos = postfijo(expresion);
+    fin = resultado(expPos);
+    mostrarConjunto(fin);
+
+    return system("pause");
 }
 
 // menu principal el cual es el centro del sistema
@@ -106,7 +91,7 @@ int menuMantenimiento()
     cout << "---2. Modificar conjunto--------------------------------------\n";
     cout << "---3. Eliminar elemento---------------------------------------\n";
     cout << "---4. Eliminar conjunto---------------------------------------\n";
-    cout << "---5. Salir del Programa--------------------------------------\n";
+    cout << "---5. Salir del Mantenimiento---------------------------------\n";
     cout << "--------------------------------------------------------------\n";
     cout << "---------<1-2-3-4-5>------------------------------------------\n";
     cin >> op;
@@ -114,16 +99,22 @@ int menuMantenimiento()
     return 0;
 }
 
-//funcion para saber si existe o no un conjunto
-bool existeConjunto(string Nombre){
-    Nodo *aux=inicio;
-    while (aux->siguienteConjunto!=NULL)    
+bool numerosRepetidos(int num)
+{
+    Nodo *aux = inicio;
+
+    while (aux != NULL)
     {
-        if(aux->nombre==Nombre){
-            return true;
-        }else{
-            aux=aux->siguienteConjunto;
+        Nodo *aux2 = aux;
+        while (aux2 != NULL)
+        {
+            if (num == aux2->dato)
+            {
+                return true;
+            }
+            aux2 = aux2->siguiente;
         }
+        aux = aux->siguienteConjunto;
     }
     return false;
 }
@@ -142,7 +133,7 @@ void crearConjunto(int tamano, string nombre)
             Nodo *aux = inicio;
             Nodo *aux2 = NULL;
 
-            cout << "Digita el numero a insertar en el conjunto";
+            cout << "Digita el numero a insertar en el conjunto: ";
             cin >> dato;
 
             nuevo->dato = dato;
@@ -179,8 +170,11 @@ void crearConjunto(int tamano, string nombre)
             Nodo *aux = cola;
             Nodo *aux2 = NULL;
 
-            cout << "Digita el numero a insertar en el conjunto";
-            cin >> dato;
+            do
+            {
+                cout << "Digita el numero a insertar en el conjunto" << i << ": ";
+                cin >> dato;
+            } while (numerosRepetidos(dato));
 
             nuevo->dato = dato;
 
@@ -226,107 +220,232 @@ void mostrarConjunto(string conjunto)
     cout << ")\n";
 }
 
-// funcion para validar los parentesis RETURN TRUE BUENO/FALSE MALO
-bool validarParentesis(char expresion[])
+// funcion para validar los parentesis
+bool validarParentesis(string expresion)
 {
-    char pila[TAMANO];
+    string pila[TAMANO];
     int tope = -1;
-    for (int i = 0; i < TAMANO; i++)
+    cout << expresion.length();
+    for (int i = 0; i < expresion.length(); i++)
     {
         if (expresion[i] == '(')
         {
             tope++;
             pila[tope] = expresion[i];
+            cout << expresion[i];
         }
-        else if (pila[tope] == '(' && expresion[i] == ')')
+        else if (expresion[i] == ')' and pila[tope] == "(")
         {
             pila[tope] = ' ';
             tope--;
+            cout << expresion[i];
+        }
+        else if (expresion[i] == ')')
+        {
+            if (pila[tope] != "(")
+                cout << "la expresion esta incorrecta\n";
+            return true;
         }
     }
-    if (tope = -1)
+    if (tope == -1)
     {
+
         cout << "la expresion esta correcta\n";
-        return true;
+        return false;
     }
     else
     {
         cout << "la expresion esta incorrecta\n";
-        return false;
+        return true;
     }
 }
 
-//funcion para validar los conjuntos en la expresion
-bool existenTodosConjuntos(string expresion){
-    Nodo *aux=inicio;
-    for (int i = 0; i < expresion.length(); i++)
+string postfijo(string expre)
+{
+    string pila[TAMANO];
+    int tope;
+    string resultado;
+
+    tope = -1;
+
+    for (int i = 0; i < expre.length(); i++)
     {
-        if ((expresion[i]>='a') && (expresion[i]<='z'))
+        if (expre[i] == '(')
         {
-            string str="";
-            str=expresion[i];
-            if(!existeConjunto(str)){
-                cout<<"conjunto "<<str<<" no existe\n";
-                return false;
+            tope++;
+            pila[tope] = expre[i];
+        }
+        else if (expre[i] == '+' or expre[i] == '*' or expre[i] == '-' or expre[i] == '/' or expre[i] == '^')
+        {
+            tope++;
+            pila[tope] = expre[i];
+        }
+        else if (expre[i] == ')')
+        {
+            while (pila[tope] != "(")
+            {
+                resultado += pila[tope];
+                pila[tope] = " ";
+                tope--;
+            }
+        }
+        else
+        {
+            resultado += expre[i];
         }
     }
-    return true;
+    while (tope != -1)
+    {
+
+        if (pila[tope] == "(")
+        {
+            pila[tope] = " ";
+            tope--;
+        }
+        else
+        {
+            resultado += pila[tope];
+            pila[tope] = " ";
+            tope--;
+        }
+    }
+    cout << endl
+         << resultado << endl;
+    return resultado;
 }
 
-void expresionPosfija(string expresion)
+string resultado(string expresion)
 {
-    system("cls");
-					cout<<"Ingresa la expresion en notacion infija (sin espacios)";
-					cin>>expInf;
-				
-					if(validar(expInf)){
-						tope=-1;
-						pos=-1;
-						tamExp=strlen(expInf);
-					
-					for(int i=0;i<tamExp;i++){
-						simbolo=expInf[i];
-						if(simbolo=='('){
-							tope++;
-							pila[tope]=simbolo;
-						}else if(simbolo==')'){
-							while(pila[tope]!='('){
-								pos++;
-								expPos[pos]=pila[tope];
-								tope--;
-							}
-							tope--;
-						}
-						else if((simbolo>='1')&&(simbolo<='9')){
-							pos++;
-							expPos[pos]=simbolo;
-						}
-						else{
-							while(tope>-1 && (prioridad(simbolo)<=prioridad(pila[tope]))){
-								pos++;
-								expPos[pos]=pila[tope];
-								tope--;
-							}
-							tope++;
-							pila[tope]=simbolo;
-						}
-					}
-					
-					while(tope>-1){
-						pos++;
-						expPos[pos]=pila[tope];
-						tope--;
-					}	
-					cout<<("la expresion en postfija es: \n");
-					for(int i=0; i<=pos;i++){
-						cout<<(expPos[i]);
-					}	
-					cout<<"\n";
-					resultadoPos(resultado,expPos,simbolo,pos);
-				cout<<"\n";
-					}else{
-						cout<<"expresion invalida";
-					}
+    int top = -1;
+    string op1;
+    string op2;
+    string solucion[TAMANO];
+    for (int i = 0; i < expresion.length(); i++)
+    {
+        if (expresion[i] >= 'a' && expresion.length() <= 'z')
+        {
+            top++;
+            solucion[top] = expresion[i];
+        }
+        if (expresion[i] == '^' || expresion[i] == '*' || expresion[i] == '/' || expresion[i] == '+' || expresion[i] == '-')
+        {
 
-    
+            op2 = solucion[top];
+
+            top--;
+
+            if (top > -1)
+            {
+
+                op1 = solucion[top];
+
+                top--;
+            }
+
+            if (op1 == " ")
+            {
+                top++;
+                solucion[top] = op2;
+            }
+            else
+            {
+                switch (expresion[i])
+                {
+                case '^':
+                    top++;
+
+                    break;
+                case '*':
+                    top++;
+                    break;
+                case '/':
+                    top++;
+                    break;
+                case '+':
+                    top++;
+                    solucion[top] = Union(op1, op2);
+                    top++;
+                    break;
+                case '-':
+                    top++;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
+    return solucion[top];
+}
+
+string Union(string op1, string op2)
+{
+    Nodo *aux = inicio;
+    Nodo *aux2 = NULL;
+    Nodo *aux3 = NULL;
+    Nodo *nuevo = new Nodo();
+    nuevo->nombre = op1 + "+" + op2;
+
+    while (aux != NULL)
+    {
+        if (aux->nombre == op1)
+        {
+            aux2 = aux;
+            if (nuevo == NULL)
+            {
+                aux2 = aux2->siguiente;
+                while (aux2 != NULL)
+                {
+                    nuevo->siguiente = aux2;
+                    aux2 = aux2->siguiente;
+                }
+            }
+            else
+            {
+                aux3 = nuevo;
+                while (aux3->siguiente != NULL)
+                {
+                    aux3 = aux3->siguiente;
+                }
+                aux2 = aux2->siguiente;
+                while (aux2 != NULL)
+                {
+                    aux3->siguiente = aux2;
+                    aux2 = aux2->siguiente;
+                }
+            }
+        }
+        else if (aux->nombre == op2)
+        {
+            aux2 = aux;
+            if (nuevo == NULL)
+            {
+                aux2 = aux2->siguiente;
+                while (aux2 != NULL)
+                {
+                    nuevo->siguiente = aux2;
+                    aux2 = aux2->siguiente;
+                }
+            }
+            else
+            {
+                aux3 = nuevo;
+                while (aux3->siguiente != NULL)
+                {
+                    aux3 = aux3->siguiente;
+                }
+                aux2 = aux2->siguiente;
+                while (aux2 != NULL)
+                {
+                    aux3->siguiente = aux2;
+                    aux2 = aux2->siguiente;
+                }
+            }
+        }
+        else
+        {
+            aux = aux->siguienteConjunto;
+        }
+    }
+    return nuevo->nombre;
 }
