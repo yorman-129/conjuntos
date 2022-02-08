@@ -23,14 +23,14 @@ int menuMantenimiento();
 void crearConjunto(int, string);
 void mostrarConjunto(string);
 bool validarParentesis(string);
-bool numerosRepetidos(int);
+bool numerosRepetidos(int, string);
 string postfijo(string);
 string resultado(string);
 string Union(string, string); // retorna nombre del nuevo conjunto unido
 
 int main()
 {
-    string expresion, nombre,expPos,fin;
+    string expresion, nombre, expPos, fin;
     int tamano;
     cout << "----------------------Menu Principal--------------------------\n";
     cout << "--------------------------------------------------------------\n";
@@ -44,6 +44,7 @@ int main()
     cout << "--------------------------------------------------------------\n";
 
     system("pause");
+    system("cls");
 
     for (int i = 0; i < expresion.length(); i++)
     {
@@ -57,10 +58,13 @@ int main()
         }
     }
 
-    expPos = postfijo(expresion);
-    fin = resultado(expPos);
-    mostrarConjunto(fin);
+    /// conjunto universal falta y validacion de elementos
+    // que cree todas las operaciones en todos los conjuntos y pa la mierda
+    system("pause");
 
+    expPos = postfijo(expresion);
+    resultado(expPos);
+    cout << "Salio de resultado\n";
     return system("pause");
 }
 
@@ -99,24 +103,28 @@ int menuMantenimiento()
     return 0;
 }
 
-bool numerosRepetidos(int num)
+bool numerosRepetidos(int num, string nombre)
 {
     Nodo *aux = inicio;
 
-    while (aux != NULL)
-    {
-        Nodo *aux2 = aux;
-        while (aux2 != NULL)
+   
+        while (aux->nombre != nombre)
         {
-            if (num == aux2->dato)
-            {
-                return true;
-            }
-            aux2 = aux2->siguiente;
+            aux = aux->siguienteConjunto;
         }
-        aux = aux->siguienteConjunto;
-    }
-    return false;
+        if(aux->nombre==nombre){
+            Nodo *aux2 = aux;
+            while (aux2 != NULL)
+            {
+                if (num == aux2->dato)
+                {
+                    return true;
+                }
+                aux2 = aux2->siguiente;
+            }
+        }else{
+            return false;
+        }
 }
 
 // funcion para la creacion de los conjuntos
@@ -133,8 +141,11 @@ void crearConjunto(int tamano, string nombre)
             Nodo *aux = inicio;
             Nodo *aux2 = NULL;
 
-            cout << "Digita el numero a insertar en el conjunto: ";
-            cin >> dato;
+            do
+            {
+                cout << "Digita el numero a insertar en el conjunto: ";
+                cin >> dato;
+            } while (numerosRepetidos(dato, nombre));
 
             nuevo->dato = dato;
 
@@ -172,9 +183,9 @@ void crearConjunto(int tamano, string nombre)
 
             do
             {
-                cout << "Digita el numero a insertar en el conjunto" << i << ": ";
+                cout << "Digita el numero a insertar en el conjunto: ";
                 cin >> dato;
-            } while (numerosRepetidos(dato));
+            } while (numerosRepetidos(dato, nombre));
 
             nuevo->dato = dato;
 
@@ -316,6 +327,8 @@ string postfijo(string expre)
 
 string resultado(string expresion)
 {
+    cout << "Entro a resultado\n";
+
     int top = -1;
     string op1;
     string op2;
@@ -327,54 +340,47 @@ string resultado(string expresion)
             top++;
             solucion[top] = expresion[i];
         }
-        if (expresion[i] == '^' || expresion[i] == '*' || expresion[i] == '/' || expresion[i] == '+' || expresion[i] == '-')
+        else if (expresion[i] == '^' || expresion[i] == '*' || expresion[i] == '/' || expresion[i] == '+' || expresion[i] == '-')
         {
 
             op2 = solucion[top];
-
+            solucion[top] = ' ';
             top--;
 
             if (top > -1)
             {
 
                 op1 = solucion[top];
-
+                solucion[top] = ' ';
                 top--;
             }
 
-            if (op1 == " ")
+            switch (expresion[i])
             {
+            case '^':
                 top++;
-                solucion[top] = op2;
-            }
-            else
-            {
-                switch (expresion[i])
-                {
-                case '^':
-                    top++;
 
-                    break;
-                case '*':
-                    top++;
-                    break;
-                case '/':
-                    top++;
-                    break;
-                case '+':
-                    top++;
-                    solucion[top] = Union(op1, op2);
-                    top++;
-                    break;
-                case '-':
-                    top++;
-                    break;
-                default:
-                    break;
-                }
+                break;
+            case '*':
+                top++;
+                break;
+            case '/':
+                top++;
+                break;
+            case '+':
+                top++;
+                solucion[top] = Union(op1, op2);
+
+                break;
+            case '-':
+                top++;
+                break;
+            default:
+                break;
             }
         }
     }
+    mostrarConjunto(solucion[top]);
     return solucion[top];
 }
 
@@ -383,9 +389,15 @@ string Union(string op1, string op2)
     Nodo *aux = inicio;
     Nodo *aux2 = NULL;
     Nodo *aux3 = NULL;
+    string nom = "";
+    nom.append(op1);
+    nom.append("+");
+    nom.append(op2);
     Nodo *nuevo = new Nodo();
-    nuevo->nombre = op1 + "+" + op2;
-
+    nuevo->nombre = nom;
+    cout << endl
+         << nuevo->nombre << endl;
+    system("pause");
     while (aux != NULL)
     {
         if (aux->nombre == op1)
@@ -394,9 +406,13 @@ string Union(string op1, string op2)
             if (nuevo == NULL)
             {
                 aux2 = aux2->siguiente;
+                Nodo *auxx = nuevo;
                 while (aux2 != NULL)
                 {
-                    nuevo->siguiente = aux2;
+                    Nodo *n = new Nodo();
+                    n->dato = aux2->dato;
+                    auxx->siguiente = n;
+                    auxx = auxx->siguiente;
                     aux2 = aux2->siguiente;
                 }
             }
@@ -410,7 +426,10 @@ string Union(string op1, string op2)
                 aux2 = aux2->siguiente;
                 while (aux2 != NULL)
                 {
-                    aux3->siguiente = aux2;
+                    Nodo *n = new Nodo();
+                    n->dato = aux2->dato;
+                    aux3->siguiente = n;
+                    aux3 = aux3->siguiente;
                     aux2 = aux2->siguiente;
                 }
             }
@@ -421,9 +440,13 @@ string Union(string op1, string op2)
             if (nuevo == NULL)
             {
                 aux2 = aux2->siguiente;
+                Nodo *auxx = nuevo;
                 while (aux2 != NULL)
                 {
-                    nuevo->siguiente = aux2;
+                    Nodo *n = new Nodo();
+                    n->dato = aux2->dato;
+                    auxx->siguiente = n;
+                    auxx = auxx->siguiente;
                     aux2 = aux2->siguiente;
                 }
             }
@@ -437,15 +460,17 @@ string Union(string op1, string op2)
                 aux2 = aux2->siguiente;
                 while (aux2 != NULL)
                 {
-                    aux3->siguiente = aux2;
+                    Nodo *n = new Nodo();
+                    n->dato = aux2->dato;
+                    aux3->siguiente = n;
+                    aux3 = aux3->siguiente;
                     aux2 = aux2->siguiente;
                 }
             }
         }
-        else
-        {
-            aux = aux->siguienteConjunto;
-        }
+        aux = aux->siguienteConjunto;
     }
+    cola->siguienteConjunto = nuevo;
+    cola = nuevo;
     return nuevo->nombre;
 }
