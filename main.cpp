@@ -3,6 +3,7 @@
 #include <string.h>
 #include <iostream>
 #include <cmath>
+#include <regex>
 #define TAMANO 15
 
 using namespace std;
@@ -25,13 +26,27 @@ void crearConjuntoUniversal(int, string);
 void mostrarConjunto(string);
 bool validarParentesis(string);
 bool numerosRepetidos(int, string);
-bool numerosRepetidosUniversal(int, string);
+bool numerosRepetidosUniversal(int);
+void modificarConjunto(string);
+void eliminarConjunto(string);
+
 string postfijo(string);
 string resultado(string);
 string Union(string, string); // retorna nombre del nuevo conjunto unido
 string interseccion(string, string);
-string diferencia(string , string );
-string diferenciaSimetrica(string , string );
+string diferencia(string, string);
+string diferenciaSimetrica(string, string);
+
+bool validarExpresion(string expr)
+{
+    const regex expresion("[a-z (+*^)/-]*");
+    return regex_match(expr, expresion);
+}
+bool validarNumeros(string expr)
+{
+    const regex expresion("[1-9]*");
+    return regex_match(expr, expresion);
+}
 
 int main()
 {
@@ -41,8 +56,12 @@ int main()
     cout << "--------------------------------------------------------------\n";
     do
     {
-        cout << "Digita tu expresion ==>\n";
-        cin >> expresion;
+        do
+        {
+            cout << "Digita tu expresion ==>\n";
+            cin >> expresion;
+        } while (!validarExpresion(expresion));
+
     } while (validarParentesis(expresion));
 
     cout << "--------------------------------------------------------------\n";
@@ -65,13 +84,53 @@ int main()
     }
 
     /// conjunto universal falta y validacion de elementos
-    cout << "Digita la cantidad de elementos en: U"  << endl;
-            cin >> tamano;
-    crearConjuntoUniversal(tamano,"u");
+    cout << "Digita la cantidad de elementos en: U" << endl;
+    cin >> tamano;
+    crearConjuntoUniversal(tamano, "u");
     mostrarConjunto("u");
 
     // que cree todas las operaciones en todos los conjuntos y pa la mierda
     system("pause");
+
+    int op = 0;
+
+    string nom, element;
+    do
+    {
+        op = menuMantenimiento();
+        switch (op)
+        {
+        case 1:
+            cout << "digita el nombre del conjunto a mostrar\n";
+            cin >> nom;
+            mostrarConjunto(nom);
+            break;
+        case 2:
+            cout << "digita el nombre del conjunto a modificar\n";
+            cin >> nom;
+            modificarConjunto(nom);
+            break;
+        case 3:
+            cout << "digita el nombre del conjunto\n";
+            cin >> nom;
+            cout << "digita el elemento a eliminar\n";
+            cin >> element;
+
+            // eliminarElemento(nom,element)
+            break;
+        case 4:
+            cout << "digita el nombre del conjunto a eliminar\n";
+            cin >> nom;
+            eliminarConjunto(nom);
+            break;
+        case 5:
+            cout << "...Saliendo." << endl;
+            break;
+
+        default:
+            break;
+        }
+    } while (op != 5);
 
     expPos = postfijo(expresion);
     resultado(expPos);
@@ -123,7 +182,7 @@ bool numerosRepetidos(int num, string nombre)
 
         if (aux->nombre == nombre)
         {
-            Nodo *aux2 = aux;
+            Nodo *aux2 = aux->siguiente;
             while (aux2 != NULL)
             {
                 if (num == aux2->dato)
@@ -138,25 +197,23 @@ bool numerosRepetidos(int num, string nombre)
     return false;
 }
 
-bool numerosRepetidosUniversal(int num, string nombre)
+bool numerosRepetidosUniversal(int num)
 {
-
     Nodo *aux = inicio;
 
     while (aux != NULL)
     {
-            Nodo *aux2 = aux;
-            while (aux2 != NULL)
+        Nodo *aux2 = aux;
+        while (aux2 != NULL)
+        {
+            if (num == aux2->dato)
             {
-                if (num == aux2->dato)
-                {
-                    return true;
-                }
-                aux2 = aux2->siguiente;
+                return true;
             }
-        aux = aux->siguienteConjunto;
+            aux2 = aux2->siguiente;
         }
-    
+        aux = aux->siguienteConjunto;
+    }
     return false;
 }
 
@@ -176,8 +233,10 @@ void crearConjunto(int tamano, string nombre)
 
             do
             {
+
                 cout << "Digita el numero a insertar en el conjunto: ";
                 cin >> dato;
+
             } while (numerosRepetidos(dato, nombre));
 
             nuevo->dato = dato;
@@ -242,8 +301,9 @@ void crearConjunto(int tamano, string nombre)
     }
 }
 
-void crearConjuntoUniversal(int tamano, string nombre){
-   Nodo *conjunto = new Nodo();
+void crearConjuntoUniversal(int tamano, string nombre)
+{
+    Nodo *conjunto = new Nodo();
     conjunto->nombre = nombre;
     if (inicio == NULL)
     {
@@ -258,10 +318,10 @@ void crearConjuntoUniversal(int tamano, string nombre){
             {
                 cout << "Digita el numero a insertar en el conjunto: ";
                 cin >> dato;
-            } while (numerosRepetidosUniversal(dato, nombre));
+            } while (numerosRepetidosUniversal(dato));
 
             nuevo->dato = dato;
-            cout<<".";
+            cout << ".";
 
             while ((aux != NULL) and (aux->dato < dato))
             {
@@ -299,7 +359,7 @@ void crearConjuntoUniversal(int tamano, string nombre){
             {
                 cout << "Digita el numero a insertar en el conjunto: ";
                 cin >> dato;
-            } while (numerosRepetidosUniversal(dato, nombre));
+            } while (numerosRepetidosUniversal(dato));
 
             nuevo->dato = dato;
 
@@ -321,7 +381,7 @@ void crearConjuntoUniversal(int tamano, string nombre){
             }
         }
     }
-    }
+}
 
 /////funcion para mostrar los conjuntos conjuntos
 void mostrarConjunto(string conjunto)
@@ -468,15 +528,15 @@ string resultado(string expresion)
                 solucion[top] = ' ';
                 top--;
             }
-string Op1="";
-string Op2="";
+            string Op1 = "";
+            string Op2 = "";
             switch (expresion[i])
             {
             case '^':
                 top++;
-             Op1 = diferencia(op1,op2);
-             Op2 = diferencia(op2,op1);
-             solucion[top] = Union(Op1, Op2);
+                Op1 = diferencia(op1, op2);
+                Op2 = diferencia(op2, op1);
+                solucion[top] = Union(Op1, Op2);
                 break;
             case '*':
                 top++;
@@ -484,6 +544,7 @@ string Op2="";
                 break;
             case '/':
                 top++;
+                solucion[top] = diferencia("u", op2);
                 break;
             case '+':
                 top++;
@@ -530,8 +591,8 @@ string Union(string op1, string op2)
                 {
                     Nodo *n = new Nodo();
                     n->dato = aux2->dato;
-                    auxx->siguiente = n;
-                    auxx = auxx->siguiente;
+                    aux3->siguiente = n;
+                    aux3 = aux3->siguiente;
                     aux2 = aux2->siguiente;
                 }
             }
@@ -546,9 +607,11 @@ string Union(string op1, string op2)
                 while (aux2 != NULL)
                 {
                     Nodo *n = new Nodo();
+
                     n->dato = aux2->dato;
                     aux3->siguiente = n;
                     aux3 = aux3->siguiente;
+
                     aux2 = aux2->siguiente;
                 }
             }
@@ -563,9 +626,11 @@ string Union(string op1, string op2)
                 while (aux2 != NULL)
                 {
                     Nodo *n = new Nodo();
+
                     n->dato = aux2->dato;
-                    auxx->siguiente = n;
-                    auxx = auxx->siguiente;
+                    aux3->siguiente = n;
+                    aux3 = aux3->siguiente;
+
                     aux2 = aux2->siguiente;
                 }
             }
@@ -580,9 +645,12 @@ string Union(string op1, string op2)
                 while (aux2 != NULL)
                 {
                     Nodo *n = new Nodo();
-                    n->dato = aux2->dato;
-                    aux3->siguiente = n;
-                    aux3 = aux3->siguiente;
+                    if (!numerosRepetidos(aux2->dato, op1))
+                    {
+                        n->dato = aux2->dato;
+                        aux3->siguiente = n;
+                        aux3 = aux3->siguiente;
+                    }
                     aux2 = aux2->siguiente;
                 }
             }
@@ -750,3 +818,82 @@ string diferencia(string op1, string op2)
     return nuevo->nombre;
 }
 
+void modificarConjunto(string nombre)
+{
+    int element;
+    Nodo *aux1 = inicio;
+    cout << "Digita el elemento del conjunto a modificar:\n";
+    cin >> element;
+    while (aux1 != NULL)
+    {
+        if (aux1->nombre == nombre)
+        {
+            Nodo *aux2 = aux1->siguiente;
+
+            while (aux2 != NULL)
+            {
+                if (element == aux2->dato)
+                {
+                    do
+                    {
+                        cout << "Digita el nuevo numero a insertar en el conjunto: ";
+                        cin >> element;
+                    } while (numerosRepetidos(element, nombre));
+
+                    aux2->dato = element;
+                }
+                aux2 = aux2->siguiente;
+            }
+        }
+        aux1 = aux1->siguienteConjunto;
+    }
+    cout << "\nse modifico con exito\n";
+}
+
+void eliminarConjunto(string nombre)
+{
+    Nodo *aux = inicio;
+    Nodo *aux1 = NULL;
+
+    if (aux == NULL)
+    {
+        cout << "Lista vacia\n";
+    }
+    else
+    {
+        cout << "entro\n";
+        Nodo *aux = inicio;
+        Nodo *aux2 = NULL;
+        if(aux->nombre==nombre){
+            aux2=aux;
+            aux=aux->siguienteConjunto;
+            inicio=aux;
+            while (aux2 != NULL)
+        {
+            Nodo *aux3 = aux2;
+            aux2 = aux2->siguiente;
+            delete aux3;
+            cout << "eliminando..\n";
+        }
+        
+        }else{
+
+        while (aux->siguienteConjunto->nombre != nombre)
+        {
+            aux = aux->siguienteConjunto;
+            cout << aux->nombre << endl;
+        }
+        aux1 = aux->siguienteConjunto;
+        aux->siguienteConjunto = aux1->siguienteConjunto;
+        aux2 = aux1;
+        cout << aux2->nombre;
+        while (aux2 != NULL)
+        {
+            Nodo *aux3 = aux2;
+            aux2 = aux2->siguiente;
+            delete aux3;
+            cout << "eliminando..\n";
+        }
+        }
+    }
+}
